@@ -24,7 +24,9 @@ HashTable::~HashTable(){
  * */
 
 unsigned int HashTable::h1 (Flight elem){
-    unsigned int key = ((((elem.m_hours) << 2) + elem.m_minuts) << 2) + elem.m_number;
+    //unsigned int key = (((elem.m_hours << 2) + elem.m_minuts) << 4) + elem.m_number;
+    unsigned int key = (elem.m_hours << 6) + (elem.m_minuts << 4) + elem.m_number;
+
     /*a - Knuth's value ~ 0.6180339887...*/
     double a = (sqrt((double)5) - 1) / 2;
     a *= key;
@@ -47,7 +49,7 @@ unsigned int HashTable::h2 (int collision){
 }
 
 void HashTable::extendTable (){
-    int prevSize = m_size;
+    unsigned int prevSize = m_size;
     m_size += initSize;
     occupied = 0;
 
@@ -66,7 +68,6 @@ void HashTable::extendTable (){
     delete [] prevStatus;
     delete [] prevTable;
 }
-
 
 void HashTable::addElem (Flight elem){
     if (ceil((double)occupied / m_size * 100) <= m_loadFactor) {
@@ -100,22 +101,22 @@ unsigned int HashTable::searchElem (Flight elem){
     unsigned int index = h1(elem);
     int count(1);
     bool isFound = false;
-        while (!isFound && count < occupied){
-            if (table[index].m_minuts == elem.m_minuts) {
-                if (table[index].m_hours == elem.m_hours) {
-                    if (table[index].m_number == elem.m_number) {
-                        isFound = true;
-                    }
+    while (!isFound && count < occupied){
+        if (table[index].m_minuts == elem.m_minuts) {
+            if (table[index].m_hours == elem.m_hours) {
+                if (table[index].m_number == elem.m_number) {
+                    isFound = true;
                 }
             }
-            if (!isFound){
-                index = h2(index);
-                count++;
-            }
         }
-     if (isFound){
-         return index;
-     } else throw "Error: record not found.";
+        if (!isFound){
+            index = h2(index);
+            count++;
+        }
+    }
+    if (isFound){
+        return index;
+    } else throw "Error: record not found.";
 }
 
 void HashTable::deleteElem (Flight elem){
@@ -126,9 +127,24 @@ void HashTable::deleteElem (Flight elem){
             occupied--;
             status[index] = 0;
         } else {
-            /*
-             * I'M HERE! I'M HERE! I'M HERE! I'M HERE! I'M HERE! 
-             * */
+            unsigned int prevSize = m_size;
+            m_size -= 1;
+            occupied = 0;
+
+            unsigned short *prevStatus = new unsigned short [m_size];
+            for (unsigned int i = 0; i < m_size; prevStatus[i] = 0, i++);
+            swap (status, prevStatus);
+
+            Flight *prevTable = new Flight [m_size];
+            swap(prevTable, table);
+
+            for (unsigned int i = 0; i < prevSize; i++){
+                if ((prevStatus[i] == 1) && (i != index)){
+                    addElem(prevTable[i]);
+                }
+            }
+            delete [] prevStatus;
+            delete [] prevTable;
         }
     } catch(const char *s) {
         printf("%s\n", s);
