@@ -21,10 +21,10 @@ class HashTable{
 
     ~HashTable();
 
-    int h1 (Flight elem);
+    unsigned int h1 (Flight elem);
 
     /*collision - место коллизии*/
-    int h2 (int collision);
+    unsigned int h2 (int collision);
 
     void extendTable ();
 
@@ -33,7 +33,7 @@ public:
 
     void deleteElem (Flight elem);
 
-    int searchElem (Flight elem);
+    unsigned int searchElem (Flight elem);
 
     void print ();
 };
