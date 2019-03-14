@@ -17,9 +17,6 @@ class HashTable{
     unsigned int initSize;
     unsigned int occupied;
 
-    HashTable(unsigned int size, unsigned short loadFactor);
-
-    ~HashTable();
 
     unsigned int h1 (Flight elem);
 
@@ -29,6 +26,10 @@ class HashTable{
     void extendTable ();
 
 public:
+    HashTable(unsigned int size, unsigned short loadFactor);
+
+    ~HashTable();
+
     void addElem (Flight elem);
 
     void deleteElem (Flight elem);
