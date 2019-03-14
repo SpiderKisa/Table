@@ -24,8 +24,7 @@ HashTable::~HashTable(){
  * */
 
 unsigned int HashTable::h1 (Flight elem){
-    //unsigned int key = (((elem.m_hours << 2) + elem.m_minuts) << 4) + elem.m_number;
-    unsigned int key = (elem.m_hours << 6) + (elem.m_minuts << 4) + elem.m_number;
+    unsigned int key = (elem.m_hours * 1000000) + (elem.m_minuts * 10000) + elem.m_number;
 
     /*a - Knuth's value ~ 0.6180339887...*/
     double a = (sqrt((double)5) - 1) / 2;
@@ -97,7 +96,6 @@ void HashTable::addElem (Flight elem){
  * if there is no this elem in table, throws an exception
  * */
 unsigned int HashTable::searchElem (Flight elem){
-    //int key = ((((elem.m_hours) << 2) + elem.m_minuts) << 2) + elem.m_number;
     unsigned int index = h1(elem);
     int count(1);
     bool isFound = false;
@@ -122,7 +120,6 @@ unsigned int HashTable::searchElem (Flight elem){
 void HashTable::deleteElem (Flight elem){
     try {
         unsigned int index = searchElem(elem);
-        unsigned int key = ((((elem.m_hours) << 2) + elem.m_minuts) << 2) + elem.m_number;
         if (index == h1(elem)){
             occupied--;
             status[index] = 0;
