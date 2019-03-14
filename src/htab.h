@@ -5,7 +5,16 @@
 struct Flight{
     unsigned short m_number;
     unsigned short m_hours;
-    unsigned short m_minuts;
+    unsigned short m_minutes;
+
+public:
+    Flight():m_number(0), m_hours(0), m_minutes(0){
+
+    }
+    Flight (unsigned short number, unsigned short hours, unsigned short minutes)
+    : m_number(number), m_minutes(minutes), m_hours(hours){
+
+    }
 };
 
 
@@ -16,7 +25,6 @@ class HashTable{
     unsigned int m_size;
     unsigned int initSize;
     unsigned int occupied;
-
 
     unsigned int h1 (Flight elem);
 
@@ -38,6 +46,5 @@ public:
 
     void print ();
 };
-
 
 #endif //TABLE_HTAB_H
