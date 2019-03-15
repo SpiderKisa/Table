@@ -28,11 +28,7 @@ class HashTable{
 
     unsigned int h1 (Flight elem);
 
-    /*collision - место коллизии*/
-    unsigned int h2 (unsigned
-    int collision);
-
-    void extendTable ();
+    unsigned int h2 (unsigned int collision);
 
 public:
     HashTable(unsigned int size, unsigned short loadFactor);

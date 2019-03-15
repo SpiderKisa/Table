@@ -95,12 +95,12 @@ void HashTable::addElem (Flight elem){
 }
 
 /*
- * returns adress of elem
- * if there is no this elem in table, throws an exception
+ * возвращает адрес элемента в таблице
+ * если элемент не найден - исключение
  * */
 unsigned int HashTable::searchElem (Flight elem){
     unsigned int index = h1(elem);
-    int count(1);
+    int count(0);
     bool isFound = false;
     while (!isFound && (count < occupied) && (status[index] == 1)){
         if (table[index].m_minutes == elem.m_minutes) {
@@ -117,7 +117,9 @@ unsigned int HashTable::searchElem (Flight elem){
     }
     if (isFound){
         return index;
-    } else throw "Error: record not found.";
+    } else {
+        throw "Error: record not found.";
+    }
 }
 
 void HashTable::deleteElem (Flight elem){
