@@ -37,9 +37,9 @@ public:
 
     void addElem (Flight elem);
 
-    void deleteElem (Flight elem);
-
     unsigned int searchElem (Flight elem);
+
+    void deleteElem (Flight elem);
 
     void print ();
 };

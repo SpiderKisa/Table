@@ -5,7 +5,7 @@
 using namespace std;
 
 HashTable::HashTable(unsigned int size, unsigned short loadFactor)
-    : m_size(size), m_loadFactor(loadFactor), occupied(0), initSize(size){
+    : m_size(size), m_loadFactor(loadFactor), occupied(0), initSize(size){,
     if (size == 0){
         throw "Error: the size of table must be greater than zero.";
     }
