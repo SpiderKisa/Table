@@ -30,6 +30,7 @@ class HashTable{
 
     unsigned int h2 (unsigned int collision);
 
+    unsigned int searchElem (Flight elem);
 public:
     HashTable(unsigned int size, unsigned short loadFactor);
 
@@ -37,7 +38,7 @@ public:
 
     void addElem (Flight elem);
 
-    unsigned int searchElem (Flight elem);
+    bool isFound (Flight elem);
 
     void deleteElem (Flight elem);
 
