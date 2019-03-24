@@ -66,7 +66,12 @@ unsigned int HashTable::h1 (Flight elem){
 unsigned int HashTable::h2 (unsigned int collision){
     unsigned int simple[] = {3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
     unsigned int step = simple[0];
-    for (int i = 0; (i < 10) && (m_size % simple[i] == 0); step = simple[i], i++);
+    for (int i = 0;  (i < 10);  i++){
+        if (m_size % simple[i] != 0){
+            step = simple[i];
+            i = 11;
+        }
+    }
     unsigned int h = collision + step;
     return h;
 }
@@ -93,6 +98,7 @@ void HashTable::addElem (Flight elem){
             occupied++;
             table[index] = elem;
         } else { /*extend*/
+
             unsigned int prevSize = m_size;
             m_size += initSize;
             occupied = 0;
@@ -137,7 +143,11 @@ unsigned int HashTable::searchElem (Flight elem) {
             }
         }
         if (!isFound) {
-            index = h2(index);
+            if (h2(index) > m_size - 1) { /*идем по кругу*/
+                index = h2(index) - m_size;
+            } else {
+                index = h2(index);
+            }
             count++;
         }
     }
@@ -193,11 +203,21 @@ bool HashTable::isFound (Flight elem){
 }
 
 void HashTable::print (){
-    unsigned int count(0);
+    char *hours = new char[3];
+    char *minutes = new char[3];
     for (int i = 0; i < m_size; i++){
         if (status[i] == 1){
-            count++;
-            printf("%d\t№%d\t%d:%d\n", count, table[i].m_number, table[i].m_hours, table[i].m_minutes);
+            if (table[i].m_hours / 10 == 0){
+                sprintf(hours, "%c%d", '0', table[i].m_hours);
+            } else {
+                sprintf(hours, "%d", table[i].m_hours);
+            }
+            if (table[i].m_minutes / 10 == 0){
+                sprintf(minutes, "%c%d", '0', table[i].m_minutes);
+            } else {
+                sprintf(minutes, "%d", table[i].m_minutes);
+            }
+            printf("№ %d\t%s:%s\n", table[i].m_number, hours, minutes);
         }
     }
     //printf("size: %d\n", m_size);
