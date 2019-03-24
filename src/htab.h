@@ -7,14 +7,11 @@ struct Flight{
     unsigned short m_hours;
     unsigned short m_minutes;
 
-public:
-    Flight():m_number(0), m_hours(0), m_minutes(0){
+    Flight();
 
-    }
-    Flight (unsigned short number, unsigned short hours, unsigned short minutes)
-    : m_number(number), m_minutes(minutes), m_hours(hours){
+    Flight (unsigned short number, unsigned short hours, unsigned short minutes);
 
-    }
+    void IsCorrect();
 };
 
 
@@ -31,6 +28,7 @@ class HashTable{
     unsigned int h2 (unsigned int collision);
 
     unsigned int searchElem (Flight elem);
+
 public:
     HashTable(unsigned int size, unsigned short loadFactor);
 

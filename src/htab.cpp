@@ -4,6 +4,25 @@
 
 using namespace std;
 
+
+Flight::Flight():m_number(0), m_hours(0), m_minutes(0) {}
+
+Flight::Flight(unsigned short number, unsigned short hours, unsigned short minutes)
+        : m_number(number), m_minutes(minutes), m_hours(hours){}
+
+void Flight::IsCorrect() {
+    if (m_number < 1000 || m_number > 9999){
+        throw "Error: Flight's number must be in the range of 1000 to 9999.";
+    }
+    if (m_hours > 23){
+        throw "Error: hours must be in the range of 0 to 23.";
+    }
+    if (m_minutes > 59){
+        throw "Error: minutes must be in the range of 0 to 59.";
+    }
+}
+
+
 HashTable::HashTable(unsigned int size, unsigned short loadFactor)
     : m_size(size), m_loadFactor(loadFactor), occupied(0), initSize(size){
     if (size == 0){
@@ -52,45 +71,52 @@ unsigned int HashTable::h2 (unsigned int collision){
     return h;
 }
 
-
 void HashTable::addElem (Flight elem){
-    /*если количество элементов соответстует коэффициенту заполняемости*/
-    if (ceil((double)(occupied + 1) / m_size * 100) <= m_loadFactor) {
-        int index = h1(elem);
-        if (status[index] == 1) {
-            do {
-                if (h2(index) > m_size - 1) { /*идем по кругу*/
-                    index = h2(index) - m_size;
-                } else {
-                    index = h2(index);
-                }
-            } while (status[index] != 0);
-        }
-        status[index] = 1;
-        occupied++;
-        table[index] = elem;
-    } else { /*extend*/
-        unsigned int prevSize = m_size;
-        m_size += initSize;
-        occupied = 0;
-
-        auto *prevStatus = new unsigned short [m_size];
-        for (unsigned int i = 0; i < m_size; prevStatus[i] = 0, i++);
-        swap (status, prevStatus);
-
-        auto *prevTable = new Flight [m_size];
-        swap(prevTable, table);
-
-        for (unsigned int i = 0; i < prevSize; i++){
-            if (prevStatus[i] == 1){
-                addElem(prevTable[i]);
+    if (isFound(elem)){
+        throw "Error: Element already exists.";
+    }
+    try {
+        elem.IsCorrect();
+        /*если количество элементов соответстует коэффициенту заполненности*/
+        if (ceil((double) (occupied + 1) / m_size * 100) <= m_loadFactor) {
+            unsigned int index = h1(elem);
+            if (status[index] == 1) {
+                do {
+                    if (h2(index) > m_size - 1) { /*идем по кругу*/
+                        index = h2(index) - m_size;
+                    } else {
+                        index = h2(index);
+                    }
+                } while (status[index] != 0);
             }
+            status[index] = 1;
+            occupied++;
+            table[index] = elem;
+        } else { /*extend*/
+            unsigned int prevSize = m_size;
+            m_size += initSize;
+            occupied = 0;
+
+            auto *prevStatus = new unsigned short[m_size];
+            for (unsigned int i = 0; i < m_size; prevStatus[i] = 0, i++);
+            swap(status, prevStatus);
+
+            auto *prevTable = new Flight[m_size];
+            swap(prevTable, table);
+
+            for (unsigned int i = 0; i < prevSize; i++) {
+                if (prevStatus[i] == 1) {
+                    addElem(prevTable[i]);
+                }
+            }
+
+            delete[] prevStatus;
+            delete[] prevTable;
+
+            addElem(elem);
         }
-
-        delete [] prevStatus;
-        delete [] prevTable;
-
-        addElem(elem);
+    } catch (const char *s){
+        printf("%s\n", s);
     }
 }
 
@@ -98,11 +124,11 @@ void HashTable::addElem (Flight elem){
  * возвращает адрес элемента в таблице
  * если элемент не найден - исключение
  * */
-unsigned int HashTable::searchElem (Flight elem){ /* BOOL нашла или нет*/
+unsigned int HashTable::searchElem (Flight elem) {
     unsigned int index = h1(elem);
     int count(0);
     bool isFound = false;
-    while (!isFound && (count < occupied) && (status[index] == 1)){
+    while (!isFound && (count < occupied) && (status[index] == 1)) {
         if (table[index].m_minutes == elem.m_minutes) {
             if (table[index].m_hours == elem.m_hours) {
                 if (table[index].m_number == elem.m_number) {
@@ -110,46 +136,47 @@ unsigned int HashTable::searchElem (Flight elem){ /* BOOL нашла или не
                 }
             }
         }
-        if (!isFound){
+        if (!isFound) {
             index = h2(index);
             count++;
         }
     }
-    if (isFound){
+    if (isFound) {
         return index;
     } else {
         throw "Error: record not found.";
     }
 }
 
+
 void HashTable::deleteElem (Flight elem){
     try {
         unsigned int index = searchElem(elem);
         unsigned int prevSize;
-        if (m_size > (occupied * 100) / m_loadFactor){
+        if (m_size > (occupied * 100) / m_loadFactor) {
             prevSize = m_size;
-            m_size -= initSize;
+            m_size -= initSize; /*narrow*/
         } else {
             prevSize = m_size;
         }
 
         occupied = 0;
 
-        auto *prevStatus = new unsigned short [m_size];
+        auto *prevStatus = new unsigned short[m_size];
         for (unsigned int i = 0; i < m_size; prevStatus[i] = 0, i++);
-        swap (status, prevStatus);
+        swap(status, prevStatus);
 
-        auto *prevTable = new Flight [m_size];
+        auto *prevTable = new Flight[m_size];
         swap(prevTable, table);
 
-        for (unsigned int i = 0; i < prevSize; i++){
-            if ((prevStatus[i] == 1) && (i != index)){
+        for (unsigned int i = 0; i < prevSize; i++) {
+            if ((prevStatus[i] == 1) && (i != index)) {
                 addElem(prevTable[i]);
             }
         }
 
-        delete [] prevStatus;
-        delete [] prevTable;
+        delete[] prevStatus;
+        delete[] prevTable;
 
     } catch(const char *s) {
         printf("%s\n", s);
@@ -157,7 +184,7 @@ void HashTable::deleteElem (Flight elem){
 }
 
 bool HashTable::isFound (Flight elem){
-    try{
+    try {
         searchElem(elem);
         return true;
     } catch (...){
@@ -166,7 +193,7 @@ bool HashTable::isFound (Flight elem){
 }
 
 void HashTable::print (){
-    int count(0);
+    unsigned int count(0);
     for (int i = 0; i < m_size; i++){
         if (status[i] == 1){
             count++;
