@@ -24,12 +24,18 @@ void Flight::IsCorrect() {
 
 
 HashTable::HashTable(unsigned int size, unsigned short loadFactor)
-    : m_size(size), m_loadFactor(loadFactor), occupied(0), initSize(size){
+    :  occupied(0), initSize(size){
     if (size == 0){
-        throw "Error: the size of table must be greater than zero.";
+        //throw "Error: the size of table must be greater than zero.";
+        m_size = 1;
+    } else {
+        m_size = size;
     }
     if (loadFactor < 1 || loadFactor > 100){
-        throw "Error: load factor must be in the range of 1 to 100.";
+        //throw "Error: load factor must be in the range of 1 to 100.";
+        m_loadFactor = 50;
+    } else {
+        m_loadFactor = loadFactor;
     }
     table = new Flight [size];
     status = new unsigned short [size];
@@ -51,11 +57,12 @@ HashTable::~HashTable(){
 unsigned int HashTable::h1 (Flight elem){
     unsigned int key = (elem.m_hours * (unsigned int)1000000) + (elem.m_minutes * (unsigned int)10000) + elem.m_number;
     /*a - Knuth's value ~ 0.6180339887...*/
-    double a = (sqrt((double)5) - 1) / 2;
+   /* double a = (sqrt((double)5) - 1) / 2;
     a *= key;
     double h, fracPart;
     fracPart = modf(a, &h);
-    h = floor((double)m_size * fracPart);
+    h = floor((double)m_size * fracPart);*/
+   unsigned int h = key % m_size;
     return (unsigned int)h;
 }
 
@@ -76,9 +83,10 @@ unsigned int HashTable::h2 (unsigned int collision){
     return h;
 }
 
-void HashTable::addElem (Flight elem){
+unsigned short HashTable::addElem (Flight elem){
     if (isFound(elem)){
-        throw "Error: Element already exists.";
+        //throw "Error: Element already exists.";
+        return 1;
     }
     try {
         elem.IsCorrect();
@@ -120,6 +128,7 @@ void HashTable::addElem (Flight elem){
             delete[] prevTable;
 
             addElem(elem);
+            return 0;
         }
     } catch (const char *s){
         printf("%s\n", s);
@@ -163,7 +172,7 @@ void HashTable::deleteElem (Flight elem){
     try {
         unsigned int index = searchElem(elem);
         unsigned int prevSize;
-        if (m_size > (occupied * 100) / m_loadFactor) {
+        if (m_size > ((occupied - 1)* 100) / m_loadFactor && m_size - initSize != 0) {
             prevSize = m_size;
             m_size -= initSize; /*narrow*/
         } else {
@@ -217,7 +226,7 @@ void HashTable::print (){
             } else {
                 sprintf(minutes, "%d", table[i].m_minutes);
             }
-            printf("№ %d\t%s:%s\n", table[i].m_number, hours, minutes);
+            printf("%d.\t%d\t%s:%s\n", i, table[i].m_number, hours, minutes);
         }
     }
     //printf("size: %d\n", m_size);

@@ -34,7 +34,7 @@ public:
 
     ~HashTable();
 
-    void addElem (Flight elem);
+    unsigned short addElem (Flight elem);//0 - добавлено, -1 - запись уже есть
 
     bool isFound (Flight elem);
 
